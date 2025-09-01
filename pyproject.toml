@@ -4,23 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mongodb-mcp"
-version = "0.1.0"
-description = "MongoDB Model Context Protocol server for Claude Desktop"
+version = "0.2.0"
+description = "🍃 MongoDB Model Context Protocol server with FastMCP - Secure, high-performance async MongoDB operations for Claude"
 authors = [
-    {name = "MongoDB MCP Contributors", email = "mongodb-mcp@example.com"}
-]
-maintainers = [
-    {name = "MongoDB MCP Contributors", email = "mongodb-mcp@example.com"}
+    {name = "MongoDB MCP Contributors", email = "w74106922@gmail.com"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
-keywords = ["mongodb", "mcp", "claude", "ai", "database", "fastmcp"]
+keywords = ["mongodb", "mcp", "claude", "fastmcp", "async", "motor", "pymongo", "database"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -29,15 +25,16 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Database",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Framework :: AsyncIO",
+    "Typing :: Typed",
 ]
 
 dependencies = [
-    "fastmcp>=2.12.0",
-    "motor>=3.3.0",
-    "pymongo>=4.5.0",
-    "pydantic>=2.0.0",
-    "pydantic-settings>=2.0.0",
+    "fastmcp>=2.12.0,<3.0.0",
+    "motor>=3.3.0,<4.0.0",
+    "pymongo>=4.5.0,<5.0.0",
+    "pydantic>=2.0.0,<3.0.0",
+    "pydantic-settings>=2.0.0,<3.0.0",
     "typing-extensions>=4.0.0",
 ]
 
@@ -46,10 +43,25 @@ dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "pytest-mock>=3.10.0",
+    "pytest-cov>=4.0.0",
     "black>=23.0.0",
     "isort>=5.12.0",
     "mypy>=1.0.0",
+    "ruff>=0.1.0",
     "pre-commit>=3.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.10.0",
+    "pytest-cov>=4.0.0",
+]
+lint = [
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
     "ruff>=0.1.0",
 ]
 
@@ -57,21 +69,104 @@ dev = [
 Homepage = "https://github.com/hexonal/mcp-mongo-config"
 Repository = "https://github.com/hexonal/mcp-mongo-config.git"
 Issues = "https://github.com/hexonal/mcp-mongo-config/issues"
-Documentation = "https://github.com/hexonal/mcp-mongo-config#readme"
+Documentation = "https://github.com/hexonal/mcp-mongo-config/blob/main/README.md"
+Changelog = "https://github.com/hexonal/mcp-mongo-config/releases"
 
 [project.scripts]
 mongodb-mcp = "mongodb_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["mongodb_mcp*"]
+
+[tool.setuptools.package-data]
+mongodb_mcp = ["py.typed"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | \.env
+  | env
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
 
 [tool.isort]
 profile = "black"
+multi_line_output = 3
+line_length = 88
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
 
 [tool.mypy]
 python_version = "3.8"
 strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
