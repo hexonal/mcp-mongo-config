@@ -42,35 +42,33 @@ class MongoDBMCPServer:
         await self.connection.disconnect()
 
 
-# Global server instance
-server_instance = MongoDBMCPServer()
-
 # Create FastMCP app
 mcp = FastMCP("MongoDB MCP Server")
 
-
-@mcp.on_startup
-async def startup():
-    """Initialize server on startup."""
-    await server_instance.setup()
+# Global server instance - will be initialized when first tool is called
+server_instance = None
 
 
-@mcp.on_shutdown  
-async def shutdown():
-    """Cleanup on shutdown."""
-    await server_instance.cleanup()
+async def ensure_server_initialized():
+    """确保服务器已初始化."""
+    global server_instance
+    if server_instance is None:
+        server_instance = MongoDBMCPServer()
+        await server_instance.setup()
 
 
 # Database Operations
 @mcp.tool
 async def list_databases() -> List[Dict[str, Any]]:
     """List all available MongoDB databases."""
+    await ensure_server_initialized()
     return await server_instance.db_handler.list_databases()
 
 
 @mcp.tool
 async def get_database_stats(database: str) -> Dict[str, Any]:
     """Get comprehensive database statistics."""
+    await ensure_server_initialized()
     return await server_instance.db_handler.get_database_stats(database)
 
 
@@ -78,24 +76,28 @@ async def get_database_stats(database: str) -> Dict[str, Any]:
 @mcp.tool
 async def list_collections(database: str) -> List[Dict[str, Any]]:
     """List collections in specified database."""
+    await ensure_server_initialized()
     return await server_instance.collection_handler.list_collections(database)
 
 
 @mcp.tool
 async def describe_collection(database: str, collection: str) -> Dict[str, Any]:
     """Get collection schema, indexes, and metadata."""
+    await ensure_server_initialized()
     return await server_instance.collection_handler.describe_collection(database, collection)
 
 
 @mcp.tool
 async def get_collection_stats(database: str, collection: str) -> Dict[str, Any]:
     """Get collection performance statistics."""
+    await ensure_server_initialized()
     return await server_instance.collection_handler.get_collection_stats(database, collection)
 
 
 @mcp.tool
 async def list_indexes(database: str, collection: str) -> List[Dict[str, Any]]:
     """List all indexes for a collection."""
+    await ensure_server_initialized()
     return await server_instance.collection_handler.list_indexes(database, collection)
 
 
@@ -111,6 +113,7 @@ async def find_documents(
     skip: int = 0
 ) -> Dict[str, Any]:
     """Find documents matching query criteria."""
+    await ensure_server_initialized()
     return await server_instance.document_handler.find_documents(
         database, collection, query, projection, sort, limit, skip
     )
@@ -124,6 +127,7 @@ async def find_one_document(
     projection: Dict[str, Any] = None
 ) -> Optional[Dict[str, Any]]:
     """Find single document matching criteria."""
+    await ensure_server_initialized()
     return await server_instance.document_handler.find_one_document(
         database, collection, query, projection
     )
@@ -136,6 +140,7 @@ async def count_documents(
     query: Dict[str, Any] = None
 ) -> int:
     """Count documents matching query."""
+    await ensure_server_initialized()
     return await server_instance.document_handler.count_documents(database, collection, query)
 
 
@@ -148,6 +153,7 @@ async def aggregate_pipeline(
     limit: int = 100
 ) -> Dict[str, Any]:
     """Execute MongoDB aggregation pipeline."""
+    await ensure_server_initialized()
     return await server_instance.aggregation_handler.aggregate_pipeline(
         database, collection, pipeline, limit, server_instance.config.mongodb_max_pipeline_stages
     )
@@ -161,6 +167,7 @@ async def insert_document(
     document: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Insert single document (requires dangerous mode)."""
+    await ensure_server_initialized()
     return await server_instance.document_handler.insert_document(database, collection, document)
 
 
@@ -173,6 +180,7 @@ async def update_document(
     upsert: bool = False
 ) -> Dict[str, Any]:
     """Update documents matching query (requires dangerous mode)."""
+    await ensure_server_initialized()
     return await server_instance.document_handler.update_document(
         database, collection, query, update, upsert
     )
@@ -185,6 +193,7 @@ async def delete_document(
     query: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Delete documents matching query (requires dangerous mode)."""
+    await ensure_server_initialized()
     return await server_instance.document_handler.delete_document(database, collection, query)
 
 
@@ -198,6 +207,7 @@ async def create_index(
     background: bool = True
 ) -> Dict[str, Any]:
     """Create index on collection (requires dangerous mode)."""
+    await ensure_server_initialized()
     kwargs = {'background': background}
     if name:
         kwargs['name'] = name

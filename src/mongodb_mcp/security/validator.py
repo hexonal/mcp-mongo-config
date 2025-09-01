@@ -1,7 +1,7 @@
 """Query and operation validation for MongoDB MCP."""
 
 from typing import Dict, List, Any, Set
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class QueryValidator:
@@ -91,7 +91,8 @@ class DocumentValidator(BaseModel):
     database: str = Field(..., min_length=1, max_length=64)
     collection: str = Field(..., min_length=1, max_length=64)
     
-    @validator('database', 'collection')
+    @field_validator('database', 'collection')
+    @classmethod
     def validate_name(cls, v):
         """Validate database and collection names."""
         if not v.replace('_', '').replace('-', '').isalnum():
