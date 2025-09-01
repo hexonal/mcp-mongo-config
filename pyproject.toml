@@ -1,26 +1,37 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mongodb-mcp"
 version = "0.1.0"
-description = "MongoDB Model Context Protocol server using FastMCP"
+description = "MongoDB Model Context Protocol server for Claude Desktop"
 authors = [
-    {name = "MongoDB MCP Contributors"}
+    {name = "MongoDB MCP Contributors", email = "mongodb-mcp@example.com"}
+]
+maintainers = [
+    {name = "MongoDB MCP Contributors", email = "mongodb-mcp@example.com"}
 ]
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.8"
+keywords = ["mongodb", "mcp", "claude", "ai", "database", "fastmcp"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
+
 dependencies = [
     "fastmcp>=2.12.0",
     "motor>=3.3.0",
@@ -39,11 +50,14 @@ dev = [
     "isort>=5.12.0",
     "mypy>=1.0.0",
     "pre-commit>=3.0.0",
+    "ruff>=0.1.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/mongodb/mongodb-mcp"
-Issues = "https://github.com/mongodb/mongodb-mcp/issues"
+Homepage = "https://github.com/hexonal/mcp-mongo-config"
+Repository = "https://github.com/hexonal/mcp-mongo-config.git"
+Issues = "https://github.com/hexonal/mcp-mongo-config/issues"
+Documentation = "https://github.com/hexonal/mcp-mongo-config#readme"
 
 [project.scripts]
 mongodb-mcp = "mongodb_mcp.server:main"

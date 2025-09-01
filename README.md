@@ -1,34 +1,64 @@
-# MongoDB MCP Server
+# 🍃 MongoDB MCP Server
 
-A Model Context Protocol (MCP) server for MongoDB operations using the FastMCP framework.
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![FastMCP](https://img.shields.io/badge/FastMCP-2.12%2B-green)](https://gofastmcp.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4.4%2B-green)](https://www.mongodb.com/)
 
-## Features
+A powerful Model Context Protocol (MCP) server for MongoDB operations, enabling Claude to interact with MongoDB databases through a secure, feature-rich interface.
 
-- **Secure by Default**: Read-only operations with optional dangerous mode for writes
-- **Comprehensive Tools**: 13 specialized tools for MongoDB operations
-- **JSON Schema Validation**: Security through input validation and sanitization
-- **Async Operations**: High-performance async MongoDB operations using Motor
-- **FastMCP Integration**: Built on FastMCP 2.0 with decorator-based tool registration
+## ✨ Features
 
-## Installation
+- 🔒 **Security First**: Read-only by default with optional dangerous mode
+- 🚀 **High Performance**: Async operations using Motor driver
+- 🌐 **Cluster Support**: Both standalone and replica set deployments
+- 🛠️ **Rich Toolset**: 13 specialized tools for complete MongoDB operations
+- 🎯 **Smart Validation**: JSON schema validation and query sanitization
+- 🌍 **Internationalization**: Full Chinese language support
+- 📡 **Standards Compliant**: Implements MCP 2024-11-05 specification
 
+## 📋 Requirements
+
+- **Python**: 3.8+ (recommended 3.10+)
+- **MongoDB**: 4.4+ 
+- **Network**: Access to MongoDB instance or cluster
+
+## 📦 Installation
+
+### From PyPI (Recommended)
 ```bash
 pip install mongodb-mcp
 ```
 
-## Configuration
-
-### Environment Variables
-
+### Development Installation
 ```bash
-MONGODB_URI="mongodb://localhost:27017"          # Connection string
-MONGODB_DATABASE="default"                       # Default database
-MONGODB_ALLOW_DANGEROUS="false"                  # Enable write operations
-MONGODB_MAX_DOCUMENTS="1000"                     # Result limit
-MONGODB_TIMEOUT="30"                             # Query timeout (seconds)
+git clone https://github.com/hexonal/mcp-mongo-config.git
+cd mcp-mongo-config
+pip install -e .
 ```
 
-### Claude Desktop Integration
+### Using uv (Fast)
+```bash
+uv add mongodb-mcp
+```
+
+## ⚙️ Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MONGODB_HOST` | `localhost` | MongoDB host address (supports cluster: `host1,host2,host3`) |
+| `MONGODB_PORT` | `27017` | MongoDB port |
+| `MONGODB_DATABASE` | `default` | Default database name |
+| `MONGODB_USERNAME` | `None` | Username for authentication |
+| `MONGODB_PASSWORD` | `None` | Password for authentication |
+| `MONGODB_AUTH_DB` | `admin` | Authentication database |
+| `MONGODB_URI` | `None` | Complete connection URI (overrides other params) |
+| `MONGODB_ALLOW_DANGEROUS` | `false` | Enable write operations |
+| `MONGODB_MAX_DOCUMENTS` | `1000` | Maximum documents per query |
+| `MONGODB_TIMEOUT` | `30` | Query timeout in seconds |
+
+### 🖥️ Claude Desktop Setup
+
+Add to your Claude Desktop configuration:
 
 ```json
 {
@@ -37,159 +67,210 @@ MONGODB_TIMEOUT="30"                             # Query timeout (seconds)
       "command": "python",
       "args": ["-m", "mongodb_mcp"],
       "env": {
-        "MONGODB_URI": "mongodb://localhost:27017",
-        "MONGODB_DATABASE": "myapp",
-        "MONGODB_MAX_DOCUMENTS": "500"
+        "MONGODB_HOST": "your-mongodb-host",
+        "MONGODB_PORT": "27017",
+        "MONGODB_DATABASE": "your-database",
+        "MONGODB_USERNAME": "your-username",
+        "MONGODB_PASSWORD": "your-password",
+        "MONGODB_AUTH_DB": "admin"
       }
     }
   }
 }
 ```
 
-## Available Tools
+### 🔗 Connection Modes
 
-### Database Operations
-- `list_databases` - List all available databases
-- `get_database_stats` - Get database statistics and metadata
+**Standalone Mode**
+```bash
+MONGODB_HOST=localhost
+MONGODB_PORT=27017
+```
 
-### Collection Operations  
-- `list_collections` - List collections in a database
-- `describe_collection` - Get collection schema, indexes, and metadata
-- `get_collection_stats` - Get collection performance statistics
-- `list_indexes` - List all indexes for a collection
+**Cluster Mode**
+```bash
+MONGODB_HOST=node1.example.com,node2.example.com,node3.example.com
+# Automatically adds: replicaSet=rs0&readPreference=secondaryPreferred
+```
 
-### Document Operations (Read-Only)
-- `find_documents` - Query documents with filtering, sorting, pagination
-- `find_one_document` - Find single document
-- `count_documents` - Efficient document counting
+## 🛠️ Available Tools
 
-### Aggregation Operations
-- `aggregate_pipeline` - Execute aggregation pipelines
+### 📊 Database Operations
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `list_databases` | List all available databases | None |
+| `get_database_stats` | Get database statistics | `database` |
 
-### Write Operations (Dangerous Mode Only)
-- `insert_document` - Insert documents
-- `update_document` - Update documents
-- `delete_document` - Delete documents
-- `create_index` - Create database indexes
+### 📦 Collection Operations
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `list_collections` | List collections in database | `database` |
+| `describe_collection` | Get collection metadata | `database`, `collection` |
+| `get_collection_stats` | Get collection statistics | `database`, `collection` |
+| `list_indexes` | List collection indexes | `database`, `collection` |
 
-## Usage Examples
+### 📄 Document Operations
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `find_documents` | Query documents | `database`, `collection`, `query?`, `limit?`, `sort?` |
+| `find_one_document` | Find single document | `database`, `collection`, `query?` |
+| `count_documents` | Count matching documents | `database`, `collection`, `query?` |
 
-### Basic Queries
+### 🔧 Aggregation Operations
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `aggregate_pipeline` | Execute aggregation pipeline | `database`, `collection`, `pipeline`, `limit?` |
+
+### ⚠️ Write Operations (Dangerous Mode)
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `insert_document` | Insert document | `database`, `collection`, `document` |
+| `update_document` | Update documents | `database`, `collection`, `query`, `update` |
+| `delete_document` | Delete documents | `database`, `collection`, `query` |
+| `create_index` | Create index | `database`, `collection`, `keys`, `options?` |
+
+## 💡 Usage Examples
+
+### Basic Operations
 ```python
-# List all databases
+# Explore your databases
 databases = await list_databases()
 
-# Find active users
-users = await find_documents(
-    database="myapp",
-    collection="users",
-    query={"status": "active"},
-    limit=50
-)
-
-# Count orders from last month
-order_count = await count_documents(
+# Find recent orders
+orders = await find_documents(
     database="ecommerce",
     collection="orders",
-    query={"created_at": {"$gte": "2025-08-01"}}
+    query={"created_at": {"$gte": "2025-08-01"}},
+    sort={"created_at": -1},
+    limit=10
 )
 ```
 
-### Aggregation Pipelines
+### Advanced Aggregations
 ```python
-# Revenue analysis
-revenue_pipeline = [
+# Sales analysis by category
+pipeline = [
     {"$match": {"status": "completed"}},
     {"$group": {
-        "_id": "$category",
-        "total_revenue": {"$sum": "$amount"},
-        "order_count": {"$sum": 1}
+        "_id": "$category", 
+        "revenue": {"$sum": "$amount"},
+        "orders": {"$sum": 1}
     }},
-    {"$sort": {"total_revenue": -1}}
+    {"$sort": {"revenue": -1}}
 ]
 
 results = await aggregate_pipeline(
     database="ecommerce",
-    collection="orders",
-    pipeline=revenue_pipeline
+    collection="orders", 
+    pipeline=pipeline
 )
 ```
 
-### Write Operations (Dangerous Mode)
+## 🔒 Security Features
+
+### 🛡️ Safe Mode (Default)
+- Read-only operations only
+- Query operator validation (blocks `$where`, `$expr`)
+- Input sanitization and depth limits
+- Result size restrictions
+
+### ⚠️ Dangerous Mode
+- Requires `MONGODB_ALLOW_DANGEROUS=true`
+- Enables write operations
+- Additional audit logging recommended
+- Use only in trusted environments
+
+### 🔍 Query Protection
 ```python
-# Requires MONGODB_ALLOW_DANGEROUS="true"
+# ✅ Safe - These work in default mode
+{"price": {"$gt": 100}}
+{"status": {"$in": ["active", "pending"]}}
 
-# Insert new user
-result = await insert_document(
-    database="myapp",
-    collection="users",
-    document={"name": "John Doe", "email": "john@example.com"}
-)
-
-# Update user status
-update_result = await update_document(
-    database="myapp",
-    collection="users",
-    query={"email": "john@example.com"},
-    update={"$set": {"status": "verified"}}
-)
+# ❌ Blocked - Requires dangerous mode
+{"$where": "this.price > 100"}
+{"$expr": {"$gt": ["$price", 100]}}
 ```
 
-## Security Features
+## 🚀 Quick Start
 
-### Query Validation
-- **Safe Operators**: Whitelist of allowed MongoDB query operators
-- **Dangerous Operators**: `$where`, `$expr`, `$jsonSchema` require explicit permission
-- **Input Sanitization**: Removes control characters and validates structure
-- **Depth Limits**: Prevents deep nesting attacks
+1. **Install the package**
+   ```bash
+   pip install mongodb-mcp
+   ```
 
-### Aggregation Security
-- **Stage Filtering**: Whitelist of safe aggregation stages
-- **Pipeline Limits**: Maximum number of stages configurable
-- **Output Prevention**: Blocks `$out`, `$merge` stages in safe mode
+2. **Set environment variables**
+   ```bash
+   export MONGODB_HOST=your-mongodb-host
+   export MONGODB_DATABASE=your-database
+   export MONGODB_USERNAME=your-username
+   export MONGODB_PASSWORD=your-password
+   ```
 
-### Write Protection
-- **Read-Only Default**: Write operations disabled by default
-- **Explicit Enablement**: Requires `MONGODB_ALLOW_DANGEROUS=true`
-- **Operation Logging**: All write operations can be logged
+3. **Add to Claude Desktop config**
+   ```json
+   {
+     "mcpServers": {
+       "mongodb": {
+         "command": "python",
+         "args": ["-m", "mongodb_mcp"],
+         "env": {
+           "MONGODB_HOST": "your-host",
+           "MONGODB_DATABASE": "your-db"
+         }
+       }
+     }
+   }
+   ```
 
-## Development
+4. **Start using in Claude**
+   ```
+   Can you list all databases in MongoDB?
+   Show me the collections in the 'ecommerce' database.
+   Find products with price greater than $100.
+   ```
 
+## 🏗️ Development
+
+### Setup Development Environment
 ```bash
-# Install development dependencies
+git clone https://github.com/hexonal/mcp-mongo-config.git
+cd mcp-mongo-config
 pip install -e ".[dev]"
+```
+
+### Code Quality
+```bash
+# Format code
+black src/
+isort src/
+
+# Type checking  
+mypy src/
 
 # Run tests
 pytest
-
-# Format code
-black src/ tests/
-isort src/ tests/
-
-# Type checking
-mypy src/
 ```
 
-## Architecture
+## 🤝 Contributing
 
-The server follows a modular design:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
 
-- **Security Layer**: Input validation and sanitization
-- **Handler Layer**: Operation-specific business logic  
-- **Connection Layer**: MongoDB client lifecycle management
-- **Server Layer**: FastMCP tool registration and coordination
+## 📄 License
 
-## Comparison with MySQL MCP
+MIT License - see [LICENSE](LICENSE) file for details.
 
-| Feature | MySQL MCP | MongoDB MCP |
-|---------|-----------|-------------|
-| **Framework** | FastMCP 2.0 | FastMCP 2.0 |
-| **Security** | AST SQL parsing | JSON schema validation |
-| **Connection** | aiomysql | motor |
-| **Operations** | 4 SQL-focused tools | 13 MongoDB-specialized tools |
-| **Query Language** | SQL | MongoDB query language + aggregation |
-| **Schema** | Fixed relational | Flexible document schema |
+## 🆚 Comparison with Other MCP Servers
 
-## License
-
-MIT License
+| Feature | MongoDB MCP | MySQL MCP | Redis MCP |
+|---------|-------------|-----------|-----------|
+| **Query Language** | MongoDB/JSON | SQL | Redis Commands |
+| **Data Model** | Document | Relational | Key-Value |
+| **Tools Count** | 13 | 4 | 8 |
+| **Async Support** | ✅ Motor | ✅ aiomysql | ✅ aioredis |
+| **Security** | JSON validation | AST parsing | Command filtering |
+| **Aggregation** | ✅ Pipelines | ✅ SQL | ❌ Limited |
