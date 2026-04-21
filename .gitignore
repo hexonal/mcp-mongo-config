@@ -23,6 +23,7 @@ share/python-wheels/
 MANIFEST
 
 # Virtual Environment
+.venv/
 venv/
 env/
 ENV/
@@ -66,6 +67,7 @@ docs/_build/
 # Temporary files
 *.tmp
 *.temp
-test_*.py
 validate_*.py
-*_test.py
+
+# Local lockfile
+uv.lock

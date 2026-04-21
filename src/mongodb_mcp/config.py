@@ -1,13 +1,22 @@
 """MongoDB MCP服务器配置管理模块."""
 
-import os
 from typing import Optional
-from pydantic import Field, validator
-from pydantic_settings import BaseSettings
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class MongoDBConfig(BaseSettings):
     """MongoDB MCP服务器配置类."""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        # Hermes and other hosts often keep many unrelated secrets in the same
+        # .env file. Ignore unknown keys instead of failing validation so the
+        # MCP server can coexist with broader application environments.
+        extra="ignore",
+    )
     
     # MongoDB连接参数
     mongodb_host: str = Field(
@@ -104,11 +113,6 @@ class MongoDBConfig(BaseSettings):
         """检测是否为集群模式."""
         return ',' in self.mongodb_host or 'replicaSet' in (self.mongodb_uri or '')
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
-
-
 def get_config() -> MongoDBConfig:
     """获取MongoDB MCP配置实例."""
     return MongoDBConfig()
